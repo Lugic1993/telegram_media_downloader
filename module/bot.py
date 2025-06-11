@@ -297,7 +297,8 @@ class DownloadBot:
         self.client.add_handler(MessageHandler(listen_forward_msg))
 
         try:
-            await send_help_str(self.bot, admin.id)
+            # await send_help_str(self.bot, admin.id)  # 已禁用：向用户发送消息
+            pass
         except Exception:
             pass
 
@@ -395,7 +396,7 @@ async def send_help_str(client: pyrogram.Client, chat_id):
         f"`[` `]` {_t('means optional, not required')}\n"
     )
 
-    await client.send_message(chat_id, msg, reply_markup=update_keyboard)
+    # await client.send_message(chat_id, msg, reply_markup=update_keyboard)  # 已禁用：向用户发送消息
 
 
 async def help_command(client: pyrogram.Client, message: pyrogram.types.Message):
@@ -410,7 +411,7 @@ async def help_command(client: pyrogram.Client, message: pyrogram.types.Message)
         None
     """
 
-    await send_help_str(client, message.chat.id)
+    # await send_help_str(client, message.chat.id)  # 已禁用：向用户发送帮助消息
 
 
 async def set_language(client: pyrogram.Client, message: pyrogram.types.Message):
@@ -426,10 +427,10 @@ async def set_language(client: pyrogram.Client, message: pyrogram.types.Message)
     """
 
     if len(message.text.split()) != 2:
-        await client.send_message(
-            message.from_user.id,
-            _t("Invalid command format. Please use /set_language en/ru/zh/ua"),
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     _t("Invalid command format. Please use /set_language en/ru/zh/ua"),
+        # )  # 已禁用：向用户发送消息
         return
 
     language = message.text.split()[1]
@@ -437,14 +438,15 @@ async def set_language(client: pyrogram.Client, message: pyrogram.types.Message)
     try:
         language = Language[language.upper()]
         _bot.app.set_language(language)
-        await client.send_message(
-            message.from_user.id, f"{_t('Language set to')} {language.name}"
-        )
+        # await client.send_message(
+        #     message.from_user.id, f"{_t('Language set to')} {language.name}"
+        # )  # 已禁用：向用户发送消息
     except KeyError:
-        await client.send_message(
-            message.from_user.id,
-            _t("Invalid command format. Please use /set_language en/ru/zh/ua"),
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     _t("Invalid command format. Please use /set_language en/ru/zh/ua"),
+        # )  # 已禁用：向用户发送消息
+        pass
 
 
 async def get_info(client: pyrogram.Client, message: pyrogram.types.Message):
@@ -456,10 +458,10 @@ async def get_info(client: pyrogram.Client, message: pyrogram.types.Message):
 
     args = message.text.split()
     if len(args) != 2:
-        await client.send_message(
-            message.from_user.id,
-            msg,
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     msg,
+        # )  # 已禁用：向用户发送消息
         return
 
     chat_id, message_id, _ = await parse_link(_bot.client, args[1])
@@ -491,10 +493,10 @@ async def get_info(client: pyrogram.Client, message: pyrogram.types.Message):
                         msg += f"├─ {key}: {value or None}\n"
 
                 msg += "`"
-    await client.send_message(
-        message.from_user.id,
-        msg,
-    )
+    # await client.send_message(
+    #     message.from_user.id,
+    #     msg,
+    # )  # 已禁用：向用户发送消息
 
 
 async def add_filter(client: pyrogram.Client, message: pyrogram.types.Message):
@@ -511,23 +513,24 @@ async def add_filter(client: pyrogram.Client, message: pyrogram.types.Message):
 
     args = message.text.split(maxsplit=1)
     if len(args) != 2:
-        await client.send_message(
-            message.from_user.id,
-            _t("Invalid command format. Please use /add_filter your filter"),
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     _t("Invalid command format. Please use /add_filter your filter"),
+        # )  # 已禁用：向用户发送消息
         return
 
     filter_str = replace_date_time(args[1])
     res, err = _bot.filter.check_filter(filter_str)
     if res:
         _bot.app.down = args[1]
-        await client.send_message(
-            message.from_user.id, f"{_t('Add download filter')} : {args[1]}"
-        )
+        # await client.send_message(
+        #     message.from_user.id, f"{_t('Add download filter')} : {args[1]}"
+        # )  # 已禁用：向用户发送消息
     else:
-        await client.send_message(
-            message.from_user.id, f"{err}\n{_t('Check error, please add again!')}"
-        )
+        # await client.send_message(
+        #     message.from_user.id, f"{err}\n{_t('Check error, please add again!')}"
+        # )  # 已禁用：向用户发送消息
+        pass
     return
 
 
@@ -541,14 +544,15 @@ async def direct_download(
     """Direct Download"""
 
     replay_message = "Direct download..."
-    last_reply_message = await download_bot.bot.send_message(
-        message.from_user.id, replay_message, reply_to_message_id=message.id
-    )
+    # last_reply_message = await download_bot.bot.send_message(
+    #     message.from_user.id, replay_message, reply_to_message_id=message.id
+    # )  # 已禁用：向用户发送消息
+    last_reply_message = None  # 不发送消息只置空，供后续逻辑参考
 
     node = TaskNode(
         chat_id=chat_id,
         from_user_id=message.from_user.id,
-        reply_message_id=last_reply_message.id,
+        reply_message_id=last_reply_message.id if last_reply_message else None,
         replay_message=replay_message,
         limit=1,
         bot=download_bot.bot,
@@ -585,11 +589,11 @@ async def download_forward_media(
         await direct_download(_bot, message.from_user.id, message, message, client)
         return
 
-    await client.send_message(
-        message.from_user.id,
-        f"1. {_t('Direct download, directly forward the message to your robot')}\n\n",
-        parse_mode=pyrogram.enums.ParseMode.HTML,
-    )
+    # await client.send_message(
+    #     message.from_user.id,
+    #     f"1. {_t('Direct download, directly forward the message to your robot')}\n\n",
+    #     parse_mode=pyrogram.enums.ParseMode.HTML,
+    # )  # 已禁用：向用户发送消息
 
 
 async def download_from_link(client: pyrogram.Client, message: pyrogram.types.Message):
@@ -614,9 +618,10 @@ async def download_from_link(client: pyrogram.Client, message: pyrogram.types.Me
 
     text = message.text.split()
     if len(text) != 1:
-        await client.send_message(
-            message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
-        )
+        # await client.send_message(
+        #     message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
+        # )  # 已禁用：向用户发送消息
+        pass
 
     chat_id, message_id, _ = await parse_link(_bot.client, text[0])
 
@@ -631,16 +636,17 @@ async def download_from_link(client: pyrogram.Client, message: pyrogram.types.Me
             if download_message:
                 await direct_download(_bot, entity.id, message, download_message)
             else:
-                client.send_message(
-                    message.from_user.id,
-                    f"{_t('From')} {entity.title} {_t('download')} {message_id} {_t('error')}!",
-                    reply_to_message_id=message.id,
-                )
+                # await client.send_message(
+                #     message.from_user.id,
+                #     f"{_t('From')} {entity.title} {_t('download')} {message_id} {_t('error')}!",
+                #     reply_to_message_id=message.id,
+                # )  # 已禁用：向用户发送消息
+                pass
         return
 
-    await client.send_message(
-        message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
-    )
+    # await client.send_message(
+    #     message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
+    # )  # 已禁用：向用户发送消息
 
 
 # pylint: disable = R0912, R0915,R0914
@@ -661,9 +667,9 @@ async def download_from_bot(client: pyrogram.Client, message: pyrogram.types.Mes
 
     args = message.text.split(maxsplit=4)
     if not message.text or len(args) < 4:
-        await client.send_message(
-            message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
-        )
+        # await client.send_message(
+        #     message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
+        # )  # 已禁用：向用户发送消息
         return
 
     url = args[1]
@@ -671,9 +677,9 @@ async def download_from_bot(client: pyrogram.Client, message: pyrogram.types.Mes
         start_offset_id = int(args[2])
         end_offset_id = int(args[3])
     except Exception:
-        await client.send_message(
-            message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
-        )
+        # await client.send_message(
+        #     message.from_user.id, msg, parse_mode=pyrogram.enums.ParseMode.HTML
+        # )  # 已禁用：向用户发送消息
         return
 
     limit = 0
@@ -691,9 +697,9 @@ async def download_from_bot(client: pyrogram.Client, message: pyrogram.types.Mes
         download_filter = replace_date_time(download_filter)
         res, err = _bot.filter.check_filter(download_filter)
         if not res:
-            await client.send_message(
-                message.from_user.id, err, reply_to_message_id=message.id
-            )
+            # await client.send_message(
+            #     message.from_user.id, err, reply_to_message_id=message.id
+            # )  # 已禁用：向用户发送消息
             return
     try:
         chat_id, _, _ = await parse_link(_bot.client, url)
@@ -708,13 +714,14 @@ async def download_from_bot(client: pyrogram.Client, message: pyrogram.types.Mes
             reply_message += (
                 f"download message id = {start_offset_id} - {end_offset_id} !"
             )
-            last_reply_message = await client.send_message(
-                message.from_user.id, reply_message, reply_to_message_id=message.id
-            )
+            # last_reply_message = await client.send_message(
+            #     message.from_user.id, reply_message, reply_to_message_id=message.id
+            # )  # 已禁用：向用户发送消息
+            last_reply_message = None  # 不发送消息只置空，供后续逻辑参考
             node = TaskNode(
                 chat_id=entity.id,
                 from_user_id=message.from_user.id,
-                reply_message_id=last_reply_message.id,
+                reply_message_id=last_reply_message.id if last_reply_message else None,
                 replay_message=reply_message,
                 limit=limit,
                 start_offset_id=start_offset_id,
@@ -727,12 +734,12 @@ async def download_from_bot(client: pyrogram.Client, message: pyrogram.types.Mes
                 _bot.download_chat_task(_bot.client, chat_download_config, node)
             )
     except Exception as e:
-        await client.send_message(
-            message.from_user.id,
-            f"{_t('chat input error, please enter the channel or group link')}\n\n"
-            f"{_t('Error type')}: {e.__class__}"
-            f"{_t('Exception message')}: {e}",
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     f"{_t('chat input error, please enter the channel or group link')}\n\n"
+        #     f"{_t('Error type')}: {e.__class__}"
+        #     f"{_t('Exception message')}: {e}",
+        # )  # 已禁用：向用户发送消息
         return
 
 
@@ -752,11 +759,11 @@ async def get_forward_task_node(
 
     if end_offset_id:
         if end_offset_id < offset_id:
-            await client.send_message(
-                message.from_user.id,
-                f" end_offset_id({end_offset_id}) < start_offset_id({offset_id}),"
-                f" end_offset_id{_t('must be greater than')} offset_id",
-            )
+            # await client.send_message(
+            #     message.from_user.id,
+            #     f" end_offset_id({end_offset_id}) < start_offset_id({offset_id}),"
+            #     f" end_offset_id{_t('must be greater than')} offset_id",
+            # )  # 已禁用：向用户发送消息
             return None
 
         limit = end_offset_id - offset_id + 1
@@ -766,55 +773,56 @@ async def get_forward_task_node(
 
     if not src_chat_id or not dst_chat_id:
         logger.info(f"{src_chat_id} {dst_chat_id}")
-        await client.send_message(
-            message.from_user.id,
-            _t("Invalid chat link") + f"{src_chat_id} {dst_chat_id}",
-            reply_to_message_id=message.id,
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     _t("Invalid chat link") + f"{src_chat_id} {dst_chat_id}",
+        #     reply_to_message_id=message.id,
+        # )  # 已禁用：向用户发送消息
         return None
 
     try:
         src_chat = await _bot.client.get_chat(src_chat_id)
         dst_chat = await _bot.client.get_chat(dst_chat_id)
     except Exception as e:
-        await client.send_message(
-            message.from_user.id,
-            f"{_t('Invalid chat link')} {e}",
-            reply_to_message_id=message.id,
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     f"{_t('Invalid chat link')} {e}",
+        #     reply_to_message_id=message.id,
+        # )  # 已禁用：向用户发送消息
         logger.exception(f"get chat error: {e}")
         return None
 
     me = await client.get_me()
     if dst_chat.id == me.id:
-        # TODO: when bot receive message judge if download
-        await client.send_message(
-            message.from_user.id,
-            _t("Cannot be forwarded to this bot, will cause an infinite loop"),
-            reply_to_message_id=message.id,
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     _t("Cannot be forwarded to this bot, will cause an infinite loop"),
+        #     reply_to_message_id=message.id,
+        # )  # 已禁用：向用户发送消息
         return None
 
     if download_filter:
         download_filter = replace_date_time(download_filter)
         res, err = _bot.filter.check_filter(download_filter)
         if not res:
-            await client.send_message(
-                message.from_user.id, err, reply_to_message_id=message.id
-            )
+            # await client.send_message(
+            #     message.from_user.id, err, reply_to_message_id=message.id
+            # )  # 已禁用：向用户发送消息
+            pass
 
-    last_reply_message = await client.send_message(
-        message.from_user.id,
-        "Forwarding message, please wait...",
-        reply_to_message_id=message.id,
-    )
+    # last_reply_message = await client.send_message(
+    #     message.from_user.id,
+    #     "Forwarding message, please wait...",
+    #     reply_to_message_id=message.id,
+    # )  # 已禁用：向用户发送消息
+    last_reply_message = None  # 不发送消息只置空，供后续逻辑参考
 
     node = TaskNode(
         chat_id=src_chat.id,
         from_user_id=message.from_user.id,
         upload_telegram_chat_id=dst_chat_id,
-        reply_message_id=last_reply_message.id,
-        replay_message=last_reply_message.text,
+        reply_message_id=last_reply_message.id if last_reply_message else None,
+        replay_message=last_reply_message.text if last_reply_message else "",
         has_protected_content=src_chat.has_protected_content,
         download_filter=download_filter,
         limit=limit,
@@ -840,12 +848,13 @@ async def get_forward_task_node(
             node.upload_user = _bot.bot
 
     if node.upload_user is _bot.client:
-        await client.edit_message_text(
-            message.from_user.id,
-            last_reply_message.id,
-            "Note that the robot may not be in the target group,"
-            " use the user account to forward",
-        )
+        # await client.edit_message_text(
+        #     message.from_user.id,
+        #     last_reply_message.id if last_reply_message else None,
+        #     "Note that the robot may not be in the target group,"
+        #     " use the user account to forward",
+        # )  # 已禁用：向用户发送消息
+        pass
 
     return node
 
@@ -861,13 +870,13 @@ async def forward_message_impl(
     async def report_error(client: pyrogram.Client, message: pyrogram.types.Message):
         """Report error"""
 
-        await client.send_message(
-            message.from_user.id,
-            f"{_t('Invalid command format')}."
-            f"{_t('Please use')} "
-            "/forward https://t.me/c/src_chat https://t.me/c/dst_chat "
-            f"1 400 `[`{_t('Filter')}`]`\n",
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     f"{_t('Invalid command format')}."
+        #     f"{_t('Please use')} "
+        #     "/forward https://t.me/c/src_chat https://t.me/c/dst_chat "
+        #     f"1 400 `[`{_t('Filter')}`]`\n",
+        # )  # 已禁用：向用户发送消息
 
     args = message.text.split(maxsplit=5)
     if len(args) < 5:
@@ -913,18 +922,19 @@ async def forward_message_impl(
             ):
                 await forward_normal_content(client, node, item)
                 if node.is_stop_transmission:
-                    await client.edit_message_text(
-                        message.from_user.id,
-                        node.reply_message_id,
-                        f"{_t('Stop Forward')}",
-                    )
+                    # await client.edit_message_text(
+                    #     message.from_user.id,
+                    #     node.reply_message_id,
+                    #     f"{_t('Stop Forward')}",
+                    # )  # 已禁用：向用户发送消息
                     break
         except Exception as e:
-            await client.edit_message_text(
-                message.from_user.id,
-                node.reply_message_id,
-                f"{_t('Error forwarding message')} {e}",
-            )
+            # await client.edit_message_text(
+            #     message.from_user.id,
+            #     node.reply_message_id,
+            #     f"{_t('Error forwarding message')} {e}",
+            # )  # 已禁用：向用户发送消息
+            pass
         finally:
             await report_bot_status(client, node, immediate_reply=True)
             node.stop_transmission()
@@ -1000,11 +1010,11 @@ async def set_listen_forward_msg(
     args = message.text.split(maxsplit=3)
 
     if len(args) < 3:
-        await client.send_message(
-            message.from_user.id,
-            f"{_t('Invalid command format')}. {_t('Please use')} /listen_forward "
-            f"https://t.me/c/src_chat https://t.me/c/dst_chat [{_t('Filter')}]\n",
-        )
+        # await client.send_message(
+        #     message.from_user.id,
+        #     f"{_t('Invalid command format')}. {_t('Please use')} /listen_forward "
+        #     f"https://t.me/c/src_chat https://t.me/c/dst_chat [{_t('Filter')}]\n",
+        # )  # 已禁用：向用户发送消息
         return
 
     src_chat_link = args[1]
@@ -1058,27 +1068,27 @@ async def listen_forward_msg(client: pyrogram.Client, message: pyrogram.types.Me
 async def stop(client: pyrogram.Client, message: pyrogram.types.Message):
     """Stops listening for forwarded messages."""
 
-    await client.send_message(
-        message.chat.id,
-        _t("Please select:"),
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton(
-                        _t("Stop Download"), callback_data="stop_download"
-                    ),
-                    InlineKeyboardButton(
-                        _t("Stop Forward"), callback_data="stop_forward"
-                    ),
-                ],
-                [  # Second row
-                    InlineKeyboardButton(
-                        _t("Stop Listen Forward"), callback_data="stop_listen_forward"
-                    )
-                ],
-            ]
-        ),
-    )
+    # await client.send_message(
+    #     message.chat.id,
+    #     _t("Please select:"),
+    #     reply_markup=InlineKeyboardMarkup(
+    #         [
+    #             [
+    #                 InlineKeyboardButton(
+    #                     _t("Stop Download"), callback_data="stop_download"
+    #                 ),
+    #                 InlineKeyboardButton(
+    #                     _t("Stop Forward"), callback_data="stop_forward"
+    #                 ),
+    #             ],
+    #             [  # Second row
+    #                 InlineKeyboardButton(
+    #                     _t("Stop Listen Forward"), callback_data="stop_listen_forward"
+    #                 )
+    #             ],
+    #         ]
+    #     ),
+    # )  # 已禁用：向用户发送消息
 
 
 async def stop_task(
@@ -1113,25 +1123,26 @@ async def stop_task(
                     )
                 ],
             )
-            await client.edit_message_text(
-                query.message.from_user.id,
-                query.message.id,
-                f"{_t('Stop')} {_t(task_type.name)}...",
-                reply_markup=InlineKeyboardMarkup(buttons),
-            )
+            # await client.edit_message_text(
+            #     query.message.from_user.id,
+            #     query.message.id,
+            #     f"{_t('Stop')} {_t(task_type.name)}...",
+            #     reply_markup=InlineKeyboardMarkup(buttons),
+            # )  # 已禁用：向用户发送消息
         else:
-            await client.edit_message_text(
-                query.message.from_user.id,
-                query.message.id,
-                f"{_t('No Task')}",
-            )
+            # await client.edit_message_text(
+            #     query.message.from_user.id,
+            #     query.message.id,
+            #     f"{_t('No Task')}",
+            # )  # 已禁用：向用户发送消息
+            pass
     else:
         task_id = query.data.split(" ")[2]
-        await client.edit_message_text(
-            query.message.from_user.id,
-            query.message.id,
-            f"{_t('Stop')} {_t(task_type.name)}...",
-        )
+        # await client.edit_message_text(
+        #     query.message.from_user.id,
+        #     query.message.id,
+        #     f"{_t('Stop')} {_t(task_type.name)}...",
+        # )  # 已禁用：向用户发送消息
         _bot.stop_task(task_id)
 
 
